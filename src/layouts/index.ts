@@ -19,4 +19,4 @@ export function buildKeyboardSections(
   return sections
 }
 
-export type { IKeyboardSection, ILayoutKey, ILayoutSpacer, KeyShape, LayoutItem } from './geometry.ts'
+export type { IKeyboardSection, ILayoutKey, ILayoutSpacer, ILayoutStack, KeyShape, LayoutItem } from './geometry.ts'

@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import type { IKeyboardSection, LayoutItem } from '../../layouts/geometry.ts'
+import type { IKeyboardSection, ILayoutStack, LayoutItem } from '../../layouts/geometry.ts'
 import type { LegendResolver } from '../../locales/index.ts'
 import styles from '../../styles/keyboard.module.css'
 import type {
@@ -12,6 +12,7 @@ import { KeyCap } from '../KeyCap/KeyCap.tsx'
 
 interface ISpacerStyle extends CSSProperties {
   '--key-u'?: number
+  '--section-gap'?: number
 }
 
 interface IKeyboardSectionProps {
@@ -37,6 +38,44 @@ interface IKeyItemProps {
   annotations?: Record<KeyCode, IKeyAnnotation>
   zones?: Record<string, IKeyZoneStyle>
   renderKeyContent?: IKeyboardMapProps['renderKeyContent']
+}
+
+interface IStackItemProps {
+  item: ILayoutStack
+  isPressed: (code: KeyCode) => boolean
+  legendFor: LegendResolver
+  secondaryLegendFor?: LegendResolver
+  annotations?: Record<KeyCode, IKeyAnnotation>
+  zones?: Record<string, IKeyZoneStyle>
+  renderKeyContent?: IKeyboardMapProps['renderKeyContent']
+}
+
+function StackItem({
+  item,
+  isPressed,
+  legendFor,
+  secondaryLegendFor,
+  annotations,
+  zones,
+  renderKeyContent,
+}: IStackItemProps) {
+  const style: ISpacerStyle = { '--key-u': item.width }
+  return (
+    <div className={styles.stack} style={style}>
+      {item.keys.map((key) => (
+        <KeyItem
+          key={key.code}
+          item={key}
+          isPressed={isPressed}
+          legendFor={legendFor}
+          secondaryLegendFor={secondaryLegendFor}
+          annotations={annotations}
+          zones={zones}
+          renderKeyContent={renderKeyContent}
+        />
+      ))}
+    </div>
+  )
 }
 
 function KeyItem({
@@ -80,16 +119,32 @@ export function KeyboardSection({
   zones,
   renderKeyContent,
 }: IKeyboardSectionProps) {
+  const sectionStyle: ISpacerStyle = { '--section-gap': section.gapLeft ?? 0 }
+
   return (
-    <div className={styles.section} data-section={section.id}>
+    <div className={styles.section} style={sectionStyle} data-section={section.id}>
       {section.rows.map((row, rowIndex) => (
         <div className={styles.row} key={`${section.id}-${rowIndex}`}>
-          {row.map((item, itemIndex) =>
-            item.kind === 'spacer' ? (
-              <Spacer key={`${section.id}-${rowIndex}-gap-${itemIndex}`} width={item.width} />
-            ) : (
+          {row.map((item, itemIndex) => {
+            const key = `${section.id}-${rowIndex}-${itemIndex}`
+            if (item.kind === 'spacer') return <Spacer key={key} width={item.width} />
+            if (item.kind === 'stack') {
+              return (
+                <StackItem
+                  key={key}
+                  item={item}
+                  isPressed={isPressed}
+                  legendFor={legendFor}
+                  secondaryLegendFor={secondaryLegendFor}
+                  annotations={annotations}
+                  zones={zones}
+                  renderKeyContent={renderKeyContent}
+                />
+              )
+            }
+            return (
               <KeyItem
-                key={item.code}
+                key={key}
                 item={item}
                 isPressed={isPressed}
                 legendFor={legendFor}
@@ -98,8 +153,8 @@ export function KeyboardSection({
                 zones={zones}
                 renderKeyContent={renderKeyContent}
               />
-            ),
-          )}
+            )
+          })}
         </div>
       ))}
     </div>

@@ -10,6 +10,8 @@ export type KeyboardPlatform = 'win' | 'mac' | 'auto'
 
 export type KeyboardTheme = 'light' | 'dark'
 
+export type KeyShape = 'rect' | 'iso-enter'
+
 export interface IKeyLegend {
   primary: string
   shift?: string
@@ -41,12 +43,47 @@ export interface IKeyRenderContext {
   annotation?: IKeyAnnotation
 }
 
+export interface ICompactKeyConfig {
+  code: KeyCode
+  w?: number
+  h?: number
+  shape?: KeyShape
+  hang?: boolean
+  legend?: string
+  shift?: string
+}
+
+export interface IKeyStackConfig {
+  stack: [KeyCode | ICompactKeyConfig, KeyCode | ICompactKeyConfig]
+  w?: number
+}
+
+export interface ISpacerConfig {
+  spacer: number
+}
+
+export type CompactLayoutItem = string | number | ICompactKeyConfig | IKeyStackConfig | ISpacerConfig
+
+export interface IKeyboardSectionConfig {
+  id: string
+  gapLeft?: number
+  rows: CompactLayoutItem[][]
+}
+
+export interface IKeyboardConfig {
+  name?: string
+  standard?: KeyboardStandard
+  sections: IKeyboardSectionConfig[]
+  legends?: Record<KeyCode, IKeyLegend | string>
+}
+
 export interface IKeyboardMapProps {
   formFactor?: KeyboardFormFactor
   standard?: KeyboardStandard
   platform?: KeyboardPlatform
   locale?: KeyboardLocale
   secondaryLocale?: KeyboardLocale
+  config?: IKeyboardConfig
   listenKeyboard?: boolean
   activeKeys?: readonly KeyCode[]
   annotations?: Record<KeyCode, IKeyAnnotation>

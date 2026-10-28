@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useKeyboardListener } from '../../hooks/useKeyboardListener.ts'
 import { useResolvedPlatform } from '../../hooks/usePlatformDetect.ts'
+import { normalizeKeyboardConfig } from '../../layouts/config.ts'
 import { buildKeyboardSections } from '../../layouts/index.ts'
 import { createLegendResolver } from '../../locales/index.ts'
 import styles from '../../styles/keyboard.module.css'
@@ -17,6 +18,7 @@ export function KeyboardMap({
   platform = 'auto',
   locale = 'en',
   secondaryLocale,
+  config,
   listenKeyboard = false,
   activeKeys,
   annotations,
@@ -28,13 +30,14 @@ export function KeyboardMap({
 }: IKeyboardMapProps) {
   const resolvedPlatform = useResolvedPlatform(platform)
   const listened = useKeyboardListener(listenKeyboard)
+  const normalized = useMemo(() => (config ? normalizeKeyboardConfig(config) : undefined), [config])
   const sections = useMemo(
-    () => buildKeyboardSections(formFactor, standard),
-    [formFactor, standard],
+    () => normalized?.sections ?? buildKeyboardSections(formFactor, standard),
+    [normalized, formFactor, standard],
   )
   const legendFor = useMemo(
-    () => createLegendResolver(locale, resolvedPlatform),
-    [locale, resolvedPlatform],
+    () => createLegendResolver(locale, resolvedPlatform, normalized?.legendOverrides),
+    [locale, resolvedPlatform, normalized],
   )
   const secondaryLegendFor = useMemo(
     () => (secondaryLocale ? createLegendResolver(secondaryLocale, resolvedPlatform) : undefined),

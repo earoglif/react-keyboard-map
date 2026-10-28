@@ -20,7 +20,11 @@ export function fallbackLabel(code: string): string {
   return code
 }
 
-export function createLegendResolver(locale: KeyboardLocale, platform: ResolvedPlatform) {
+export function createLegendResolver(
+  locale: KeyboardLocale,
+  platform: ResolvedPlatform,
+  overrides?: Readonly<Record<string, Partial<IKeyLegend>>>,
+) {
   const table = resolveLocaleTable(locale)
   const modifiers = platformModifiers[platform]
   const cache = new Map<string, IKeyLegend>()
@@ -31,7 +35,14 @@ export function createLegendResolver(locale: KeyboardLocale, platform: ResolvedP
 
     const base = table[code] ?? { primary: fallbackLabel(code) }
     const modifier = modifiers[code]
-    const legend = modifier ? { ...base, primary: modifier.primary } : base
+    const resolved = modifier ? { ...base, primary: modifier.primary } : base
+    const override = overrides?.[code]
+    const legend: IKeyLegend = override
+      ? {
+          primary: override.primary ?? resolved.primary,
+          shift: override.shift ?? resolved.shift,
+        }
+      : resolved
     cache.set(code, legend)
     return legend
   }

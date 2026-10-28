@@ -17,11 +17,18 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./style.css": "./dist/style.css"
+    "./style.css": "./dist/style.css",
+    "./mcp": {
+      "types": "./dist/mcp/server.d.ts",
+      "import": "./dist/mcp/server.js"
+    }
+  },
+  "bin": {
+    "react-keyboard-map-mcp": "./dist/mcp/cli.js"
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build --mode lib && tsc -p tsconfig.lib.json && node scripts/rewrite-declaration-extensions.mjs",
+    "build": "tsc -b && vite build --mode lib && vite build --config vite.mcp.config.ts && tsc -p tsconfig.lib.json && tsc -p tsconfig.mcp.json && node scripts/rewrite-declaration-extensions.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
@@ -47,5 +54,9 @@
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.72.0",
     "vite": "^8.3.5"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "zod": "^4.6.7"
   }
 }

@@ -1,6 +1,6 @@
-import type { KeyCode } from '../types/keyboard.types.ts'
+import type { KeyCode, KeyShape } from '../types/keyboard.types.ts'
 
-export type KeyShape = 'rect' | 'iso-enter'
+export type { KeyShape }
 
 export interface ILayoutKey {
   kind: 'key'
@@ -16,10 +16,17 @@ export interface ILayoutSpacer {
   width: number
 }
 
-export type LayoutItem = ILayoutKey | ILayoutSpacer
+export interface ILayoutStack {
+  kind: 'stack'
+  width: number
+  keys: [ILayoutKey, ILayoutKey]
+}
+
+export type LayoutItem = ILayoutKey | ILayoutSpacer | ILayoutStack
 
 export interface IKeyboardSection {
-  id: 'main' | 'nav' | 'numpad'
+  id: string
+  gapLeft?: number
   rows: LayoutItem[][]
 }
 

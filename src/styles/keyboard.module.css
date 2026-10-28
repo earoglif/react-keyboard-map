@@ -1,0 +1,176 @@
+.root {
+  --rkm-unit: 44px;
+  --rkm-gap: 5px;
+  --rkm-radius: 7px;
+  --rkm-key-bg: #f7f6f3;
+  --rkm-key-bg-active: #2563eb;
+  --rkm-key-text: #1c1917;
+  --rkm-key-text-active: #ffffff;
+  --rkm-key-border: #e7e5e4;
+  --rkm-key-shadow: #d6d3d1;
+  --rkm-legend-muted: #78716c;
+  --rkm-badge-bg: rgba(28, 25, 23, 0.08);
+  --rkm-tooltip-bg: #1c1917;
+  --rkm-tooltip-text: #fafaf9;
+  --rkm-font: system-ui, 'Segoe UI', sans-serif;
+
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--rkm-unit) * 0.5);
+  width: max-content;
+  font-family: var(--rkm-font);
+  line-height: 1.1;
+  user-select: none;
+}
+
+.themeDark {
+  --rkm-key-bg: #292524;
+  --rkm-key-bg-active: #2563eb;
+  --rkm-key-text: #fafaf9;
+  --rkm-key-text-active: #ffffff;
+  --rkm-key-border: #44403c;
+  --rkm-key-shadow: #0c0a09;
+  --rkm-legend-muted: #a8a29e;
+  --rkm-badge-bg: rgba(250, 250, 249, 0.12);
+  --rkm-tooltip-bg: #fafaf9;
+  --rkm-tooltip-text: #1c1917;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rkm-gap);
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rkm-gap);
+  height: var(--rkm-unit);
+}
+
+.spacer {
+  flex: none;
+  width: calc(var(--rkm-unit) * var(--key-u, 1) + var(--rkm-gap) * (var(--key-u, 1) - 1));
+}
+
+.cap {
+  position: relative;
+  box-sizing: border-box;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--rkm-unit) * var(--key-u, 1) + var(--rkm-gap) * (var(--key-u, 1) - 1));
+  height: calc(var(--rkm-unit) * var(--key-h, 1) + var(--rkm-gap) * (var(--key-h, 1) - 1));
+  padding: 3px 4px;
+  border: 1px solid var(--key-border, var(--rkm-key-border));
+  border-radius: var(--rkm-radius);
+  background: var(--key-bg, var(--rkm-key-bg));
+  color: var(--key-color, var(--rkm-key-text));
+  box-shadow: 0 2px 0 var(--key-shadow, var(--rkm-key-shadow));
+  font-size: calc(var(--rkm-unit) * 0.3);
+  font-weight: 600;
+}
+
+.capActive {
+  background: var(--rkm-key-bg-active);
+  border-color: var(--rkm-key-bg-active);
+  color: var(--rkm-key-text-active);
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.capDisabled {
+  opacity: 0.45;
+}
+
+.hang {
+  z-index: 1;
+  height: calc(var(--rkm-unit) * 2 + var(--rkm-gap));
+  margin-top: calc(-1 * (var(--rkm-unit) + var(--rkm-gap)));
+}
+
+/* Stem takes 1.25u in the row; the top bar is 1.5u and overlaps the key on the left. */
+.isoEnter {
+  width: calc(var(--rkm-unit) * 1.5 + var(--rkm-gap) * 0.5);
+  margin-left: calc(var(--rkm-unit) * -0.25 - var(--rkm-gap) * 0.25);
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 100%,
+    calc(var(--rkm-unit) * 0.25 + var(--rkm-gap) * 0.25) 100%,
+    calc(var(--rkm-unit) * 0.25 + var(--rkm-gap) * 0.25) var(--rkm-unit),
+    0 var(--rkm-unit)
+  );
+}
+
+.hasCorner {
+  padding-top: calc(var(--rkm-unit) * 0.32);
+}
+
+.primary {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shift,
+.secondary {
+  position: absolute;
+  top: 4px;
+  font-size: 0.62em;
+  font-weight: 500;
+  color: var(--rkm-legend-muted);
+}
+
+.shift {
+  left: 5px;
+}
+
+.secondary {
+  right: 5px;
+}
+
+.capActive .shift,
+.capActive .secondary {
+  color: inherit;
+  opacity: 0.8;
+}
+
+.badge {
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  max-width: calc(100% - 6px);
+  overflow: hidden;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: var(--rkm-badge-bg);
+  font-size: 0.58em;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tooltip {
+  position: absolute;
+  z-index: 2;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--rkm-tooltip-bg);
+  color: var(--rkm-tooltip-text);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.cap:hover .tooltip {
+  opacity: 1;
+}

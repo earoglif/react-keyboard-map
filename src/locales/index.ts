@@ -1,5 +1,6 @@
-import type { IKeyLegend, KeyboardLocale, LegendMap } from '../types/keyboard.types.ts'
+import type { IKeyLegend, IKeyLegendOverride, KeyboardLocale, LegendMap } from '../types/keyboard.types.ts'
 import { enLegends } from './en.ts'
+import { builtinLegendIcon } from './icons.ts'
 import type { ResolvedPlatform } from './modifiers.ts'
 import { platformModifiers } from './modifiers.ts'
 import { ruLegends } from './ru.ts'
@@ -20,10 +21,22 @@ export function fallbackLabel(code: string): string {
   return code
 }
 
+function resolveLegendIcon(
+  code: string,
+  platform: ResolvedPlatform,
+  override: IKeyLegendOverride | undefined,
+): string | undefined {
+  if (override && Object.hasOwn(override, 'icon')) {
+    const icon = override.icon?.trim() ?? ''
+    return icon || undefined
+  }
+  return builtinLegendIcon(code, platform)
+}
+
 export function createLegendResolver(
   locale: KeyboardLocale,
   platform: ResolvedPlatform,
-  overrides?: Readonly<Record<string, Partial<IKeyLegend>>>,
+  overrides?: Readonly<Record<string, IKeyLegendOverride>>,
 ) {
   const table = resolveLocaleTable(locale)
   const modifiers = platformModifiers[platform]
@@ -35,14 +48,13 @@ export function createLegendResolver(
 
     const base = table[code] ?? { primary: fallbackLabel(code) }
     const modifier = modifiers[code]
-    const resolved = modifier ? { ...base, primary: modifier.primary } : base
     const override = overrides?.[code]
-    const legend: IKeyLegend = override
-      ? {
-          primary: override.primary ?? resolved.primary,
-          shift: override.shift ?? resolved.shift,
-        }
-      : resolved
+    const icon = resolveLegendIcon(code, platform, override)
+    const legend: IKeyLegend = {
+      primary: override?.primary ?? modifier?.primary ?? base.primary,
+      shift: override?.shift ?? base.shift,
+      ...(icon ? { icon } : {}),
+    }
     cache.set(code, legend)
     return legend
   }

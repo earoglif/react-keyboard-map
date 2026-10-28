@@ -2,6 +2,7 @@ import { memo, type CSSProperties, type ReactNode } from 'react'
 import type { KeyShape } from '../../layouts/geometry.ts'
 import type { IKeyAnnotation, IKeyLegend, IKeyRenderContext, KeyCode } from '../../types/keyboard.types.ts'
 import styles from '../../styles/keyboard.module.css'
+import { KeyLegendIcon } from './KeyLegendIcon.tsx'
 
 interface IKeyCapStyle extends CSSProperties {
   '--key-u'?: number
@@ -86,7 +87,11 @@ export const KeyCap = memo(function KeyCap({
         <>
           {legend.shift ? <span className={styles.shift}>{legend.shift}</span> : null}
           {secondaryText ? <span className={styles.secondary}>{secondaryText}</span> : null}
-          {legend.primary ? <span className={styles.primary}>{legend.primary}</span> : null}
+          {legend.icon ? (
+            <KeyLegendIcon name={legend.icon} label={legend.primary} />
+          ) : legend.primary ? (
+            <span className={styles.primary}>{legend.primary}</span>
+          ) : null}
           {annotation?.badge ? <span className={styles.badge}>{annotation.badge}</span> : null}
           {annotation?.tooltip ? <span className={styles.tooltip}>{annotation.tooltip}</span> : null}
         </>

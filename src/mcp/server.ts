@@ -31,6 +31,7 @@ const CONFIG_FORMAT = `Compact IKeyboardConfig JSON:
 }
 Rules:
 - A string is a 1u x 1u key. Use KeyboardEvent.code names such as KeyQ, Digit1, ShiftLeft, ControlLeft, MetaLeft, AltLeft, ArrowUp, Fn, Macro1.
+- Optional icon is a Lucide kebab-case name, for example { "code": "KeyC", "icon": "copy" } or "legends": { "KeyC": { "icon": "copy" } }. "icon": "" keeps the text label. Arrows, Shift, and Mac command/option already have icons.
 - A number is an empty spacer in key units, for example 0.5 or 1.
 - Set w, h, shape, or hang only when the key is not 1u. ISO Enter is { "code": "Enter", "shape": "iso-enter", "hang": true }.
 - stack holds two half-height keys in one row slot.

@@ -57,6 +57,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.2",
+    "lucide-react": "^1.63.0",
     "zod": "^4.6.7"
   }
 }

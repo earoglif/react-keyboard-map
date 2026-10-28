@@ -127,6 +127,13 @@
   white-space: nowrap;
 }
 
+.icon {
+  display: block;
+  width: 1em;
+  height: 1em;
+  flex: none;
+}
+
 .shift,
 .secondary {
   position: absolute;

@@ -12,6 +12,7 @@ export type {
   ICompactKeyConfig,
   IKeyAnnotation,
   IKeyLegend,
+  IKeyLegendOverride,
   IKeyRenderContext,
   IKeyStackConfig,
   IKeyZoneStyle,

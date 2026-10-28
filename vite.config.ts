@@ -20,7 +20,11 @@ export default defineConfig(({ mode }) => {
         cssFileName: 'style',
       },
       rollupOptions: {
-        external: ['react', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
+        external: (id) =>
+          id === 'react' ||
+          id.startsWith('react/') ||
+          id === 'lucide-react' ||
+          id.startsWith('lucide-react/'),
       },
       sourcemap: true,
     },

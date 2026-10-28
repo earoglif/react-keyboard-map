@@ -1,4 +1,4 @@
-import type { ICompactKeyConfig, IKeyLegend, KeyCode } from '../types/keyboard.types.ts'
+import type { ICompactKeyConfig, IKeyLegendOverride, KeyCode } from '../types/keyboard.types.ts'
 import type { IKeyboardSection, ILayoutKey, ILayoutStack, KeyShape, LayoutItem } from './geometry.ts'
 import { KNOWN_KEY_CODES, suggestKeyCode } from './keycodes.ts'
 
@@ -26,7 +26,7 @@ export interface ILayoutRowReport {
 
 export interface INormalizedKeyboard {
   sections: IKeyboardSection[]
-  legendOverrides: Record<string, Partial<IKeyLegend>>
+  legendOverrides: Record<string, IKeyLegendOverride>
 }
 
 export interface ILayoutValidationResult {
@@ -76,6 +76,7 @@ function readKeyConfig(value: Record<string, unknown>, path: string): ICompactKe
   if (value.hang !== undefined && typeof value.hang !== 'boolean') fail(path, 'hang must be a boolean')
   if (value.legend !== undefined && typeof value.legend !== 'string') fail(path, 'legend must be a string')
   if (value.shift !== undefined && typeof value.shift !== 'string') fail(path, 'shift must be a string')
+  if (value.icon !== undefined && typeof value.icon !== 'string') fail(path, 'icon must be a string')
 
   return {
     code: value.code,
@@ -85,28 +86,34 @@ function readKeyConfig(value: Record<string, unknown>, path: string): ICompactKe
     ...(typeof value.hang === 'boolean' ? { hang: value.hang } : {}),
     ...(typeof value.legend === 'string' ? { legend: value.legend } : {}),
     ...(typeof value.shift === 'string' ? { shift: value.shift } : {}),
+    ...(typeof value.icon === 'string' ? { icon: value.icon } : {}),
   }
 }
 
-function legendPartial(legend: string | undefined, shift: string | undefined): Partial<IKeyLegend> | undefined {
-  if (legend === undefined && shift === undefined) return undefined
+function legendPartial(compact: ICompactKeyConfig): IKeyLegendOverride | undefined {
+  const hasIcon = compact.icon !== undefined
+  if (compact.legend === undefined && compact.shift === undefined && !hasIcon) return undefined
   return {
-    ...(legend !== undefined ? { primary: legend } : {}),
-    ...(shift !== undefined ? { shift } : {}),
+    ...(compact.legend !== undefined ? { primary: compact.legend } : {}),
+    ...(compact.shift !== undefined ? { shift: compact.shift } : {}),
+    ...(hasIcon ? { icon: compact.icon } : {}),
   }
 }
 
 function mergeLegend(
-  target: Record<string, Partial<IKeyLegend>>,
+  target: Record<string, IKeyLegendOverride>,
   code: KeyCode,
-  next: Partial<IKeyLegend> | undefined,
+  next: IKeyLegendOverride | undefined,
 ) {
   if (!next) return
   const current = target[code]
-  target[code] = {
+  const merged: IKeyLegendOverride = {
     primary: next.primary ?? current?.primary,
     shift: next.shift ?? current?.shift,
   }
+  if (Object.hasOwn(next, 'icon')) merged.icon = next.icon
+  else if (current && Object.hasOwn(current, 'icon')) merged.icon = current.icon
+  target[code] = merged
 }
 
 function normalizeKey(source: ICompactKeyConfig, path: string): ILayoutKey {
@@ -126,7 +133,7 @@ function normalizeKey(source: ICompactKeyConfig, path: string): ILayoutKey {
 function normalizeStack(
   source: Record<string, unknown>,
   path: string,
-  legends: Record<string, Partial<IKeyLegend>>,
+  legends: Record<string, IKeyLegendOverride>,
 ): ILayoutStack {
   if (!Array.isArray(source.stack) || source.stack.length !== 2) fail(path, 'stack must contain exactly two keys')
   const width = source.w === undefined ? 1 : source.w
@@ -135,7 +142,7 @@ function normalizeStack(
     const entryPath = `${path}.stack[${index}]`
     const compact = typeof entry === 'string' ? { code: entry } : isRecord(entry) ? readKeyConfig(entry, entryPath) : fail(entryPath, 'stack key must be a code or object')
     const key = normalizeKey({ ...compact, w: width, h: STACK_KEY_HEIGHT, hang: false, shape: 'rect' }, entryPath)
-    mergeLegend(legends, key.code, legendPartial(compact.legend, compact.shift))
+    mergeLegend(legends, key.code, legendPartial(compact))
     return { ...key, height: STACK_KEY_HEIGHT, hang: false, shape: 'rect' as const }
   })
   const top = keys[0]
@@ -144,7 +151,7 @@ function normalizeStack(
   return { kind: 'stack', width, keys: [top, bottom] }
 }
 
-function normalizeItem(item: unknown, path: string, legends: Record<string, Partial<IKeyLegend>>): LayoutItem {
+function normalizeItem(item: unknown, path: string, legends: Record<string, IKeyLegendOverride>): LayoutItem {
   if (typeof item === 'string') {
     if (item.trim() === '') fail(path, 'key code is empty')
     return { kind: 'key', code: item, width: 1, height: 1, shape: 'rect', hang: false }
@@ -161,26 +168,36 @@ function normalizeItem(item: unknown, path: string, legends: Record<string, Part
   if ('stack' in item) return normalizeStack(item, path, legends)
   const compact = readKeyConfig(item, path)
   const key = normalizeKey(compact, path)
-  mergeLegend(legends, key.code, legendPartial(compact.legend, compact.shift))
+  mergeLegend(legends, key.code, legendPartial(compact))
   return key
 }
 
-function readLegendMap(value: unknown, path: string): Record<string, Partial<IKeyLegend>> {
+function readLegendEntry(entry: Record<string, unknown>, path: string): IKeyLegendOverride {
+  const { primary, shift, icon } = entry
+  if (primary !== undefined && typeof primary !== 'string') fail(path, 'primary must be a string')
+  if (shift !== undefined && typeof shift !== 'string') fail(path, 'shift must be a string')
+  if (icon !== undefined && typeof icon !== 'string') fail(path, 'icon must be a string')
+  if (primary === undefined && shift === undefined && icon === undefined) {
+    fail(path, 'legend must be a string or { primary?, shift?, icon? }')
+  }
+  return {
+    ...(typeof primary === 'string' ? { primary } : {}),
+    ...(typeof shift === 'string' ? { shift } : {}),
+    ...(typeof icon === 'string' ? { icon } : {}),
+  }
+}
+
+function readLegendMap(value: unknown, path: string): Record<string, IKeyLegendOverride> {
   if (value === undefined) return {}
   if (!isRecord(value)) fail(path, 'legends must be an object')
-  const legends: Record<string, Partial<IKeyLegend>> = {}
+  const legends: Record<string, IKeyLegendOverride> = {}
   for (const [code, entry] of Object.entries(value)) {
     if (typeof entry === 'string') {
       legends[code] = { primary: entry }
       continue
     }
-    if (!isRecord(entry) || typeof entry.primary !== 'string') {
-      fail(`${path}.${code}`, 'legend must be a string or { primary, shift? }')
-    }
-    legends[code] = {
-      primary: entry.primary,
-      ...(typeof entry.shift === 'string' ? { shift: entry.shift } : {}),
-    }
+    if (!isRecord(entry)) fail(`${path}.${code}`, 'legend must be a string or { primary?, shift?, icon? }')
+    legends[code] = readLegendEntry(entry, `${path}.${code}`)
   }
   return legends
 }

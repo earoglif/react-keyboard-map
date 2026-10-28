@@ -12,9 +12,16 @@ export type KeyboardTheme = 'light' | 'dark'
 
 export type KeyShape = 'rect' | 'iso-enter'
 
+export interface IKeyLegendOverride {
+  primary?: string
+  shift?: string
+  icon?: string
+}
+
 export interface IKeyLegend {
   primary: string
   shift?: string
+  icon?: string
 }
 
 export type LegendMap = Record<KeyCode, IKeyLegend>
@@ -51,6 +58,7 @@ export interface ICompactKeyConfig {
   hang?: boolean
   legend?: string
   shift?: string
+  icon?: string
 }
 
 export interface IKeyStackConfig {
@@ -74,7 +82,7 @@ export interface IKeyboardConfig {
   name?: string
   standard?: KeyboardStandard
   sections: IKeyboardSectionConfig[]
-  legends?: Record<KeyCode, IKeyLegend | string>
+  legends?: Record<KeyCode, IKeyLegendOverride | string>
 }
 
 export interface IKeyboardMapProps {

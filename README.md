@@ -138,6 +138,44 @@ You can scale the keyboard or customize colors by overriding CSS custom properti
 }
 ```
 
+## MCP Server
+
+The package ships a [Model Context Protocol](https://modelcontextprotocol.io) server (`react-keyboard-map-mcp`, stdio transport) that helps AI assistants build a keyboard layout config (`IKeyboardConfig` JSON) from a model name or a keyboard photo.
+
+### Setup
+
+Build the project, then register the server in your MCP client (for example `.cursor/mcp.json`):
+
+```bash
+npm run build
+```
+
+```json
+{
+  "mcpServers": {
+    "react-keyboard-map": {
+      "command": "node",
+      "args": ["/absolute/path/to/react-keyboard-map/dist/mcp/cli.js"]
+    }
+  }
+}
+```
+
+### Tools
+
+| Tool | Description |
+| --- | --- |
+| `get_base_preset` | Returns a built-in layout (`60%`, `65%`, `75%`, `tkl`, `96%`, `full`, `laptop`) in `ansi` or `iso` |
+| `search_keyboard_model` | Finds a keyboard by model name or QMK id (for example `keychron/q1`) and converts its QMK layout |
+| `validate_and_preview_layout` | Checks row widths, hanging keys, and key codes; returns errors, warnings, and an ASCII preview |
+| `list_supported_keycodes` | Lists the `KeyboardEvent.code` and virtual key codes accepted in layouts |
+
+### Prompts
+
+| Prompt | Description |
+| --- | --- |
+| `configure-keyboard` | Step-by-step instructions for turning a keyboard photo or model name into a validated JSON config (optional `model` argument) |
+
 ## Development
 
 ```bash

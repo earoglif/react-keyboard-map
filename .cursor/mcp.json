@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "react-keyboard-map": {
-      "command": "node",
-      "args": ["D:/www/react-keyboard-map/dist/mcp/cli.js"]
-    }
-  }
-}

@@ -144,18 +144,14 @@ The package ships a [Model Context Protocol](https://modelcontextprotocol.io) se
 
 ### Setup
 
-Build the project, then register the server in your MCP client (for example `.cursor/mcp.json`):
-
-```bash
-npm run build
-```
+Install the package, then register the server in your MCP client (for example `.cursor/mcp.json`). `npx` runs the published `react-keyboard-map-mcp` binary:
 
 ```json
 {
   "mcpServers": {
     "react-keyboard-map": {
-      "command": "node",
-      "args": ["/absolute/path/to/react-keyboard-map/dist/mcp/cli.js"]
+      "command": "npx",
+      "args": ["-y", "--package", "react-keyboard-map", "react-keyboard-map-mcp"]
     }
   }
 }

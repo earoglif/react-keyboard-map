@@ -1,11 +1,33 @@
 {
   "name": "react-keyboard-map",
-  "private": true,
   "version": "0.1.0",
+  "description": "A customizable React component for visualizing keyboard layouts, physical key presses, hotkeys, and color-coded key zones.",
+  "license": "MIT",
   "type": "module",
   "sideEffects": [
     "**/*.css"
   ],
+  "keywords": [
+    "react",
+    "keyboard",
+    "keyboard-layout",
+    "hotkeys",
+    "keymap",
+    "ansi",
+    "iso",
+    "mcp"
+  ],
+  "homepage": "https://github.com/earoglif/react-keyboard-map#readme",
+  "bugs": {
+    "url": "https://github.com/earoglif/react-keyboard-map/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/earoglif/react-keyboard-map.git"
+  },
+  "engines": {
+    "node": ">=18"
+  },
   "files": [
     "dist"
   ],
@@ -29,10 +51,14 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build --mode lib && vite build --config vite.mcp.config.ts && tsc -p tsconfig.lib.json && tsc -p tsconfig.mcp.json && node scripts/rewrite-declaration-extensions.mjs",
+    "prepack": "npm run build",
     "lint": "eslint .",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0"
